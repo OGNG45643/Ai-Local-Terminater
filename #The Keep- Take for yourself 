@@ -1,0 +1,19 @@
+import os
+import sys
+
+def terminate_and_reboot():
+    print("Terminating Python process and rebooting the system...")
+    
+    # 1. Gracefully stop the current Python execution engine
+    sys.exit("Python script terminated.")
+    
+    # 2. Trigger the OS level system reboot
+    if sys.platform == "win32":
+        # Windows: /r forces restart, /t 0 sets the delay timer to 0 seconds
+        os.system("shutdown /r /t 0")
+    elif sys.platform in ["linux", "linux2", "darwin"]:
+        # Linux and macOS (Darwin): sudo reboot safely restarts the machine
+        os.system("sudo reboot")
+
+if __name__ == "__main__":
+    terminate_and_reboot()
