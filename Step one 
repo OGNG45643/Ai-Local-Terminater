@@ -1,0 +1,29 @@
+#insert this code first- 
+
+
+import os
+import psutil
+
+# Keywords associated with common local AI engines and processes
+AI_PROCESS_KEYWORDS = ["ollama", "llama", "localai", "stable-diffusion", "python"]
+
+def stop_local_ai():
+    print("Scanning for local AI processes...")
+    current_pid = os.getpid()
+    
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            # Avoid killing this script itself
+            if proc.info['pid'] == current_pid:
+                continue
+                
+            proc_name = proc.info['name'].lower()
+            if any(keyword in proc_name for keyword in AI_PROCESS_KEYWORDS):
+                print(f"Terminating AI-related process: {proc.info['name']} (PID: {proc.info['pid']})")
+                p = psutil.Process(proc.info['pid'])
+                p.terminate()  # Safely close the process
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+
+if __name__ == "__main__":
+    stop_local_ai()
