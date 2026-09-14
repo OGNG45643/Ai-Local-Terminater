@@ -1,0 +1,40 @@
+import sys
+
+# Standard domain names without protocol prefixes
+AI_DOMAINS = [
+    "openai.com",
+    "www.openai.com",
+    "chatgpt.com",
+    "www.chatgpt.com",
+    "anthropic.com",
+    "www.anthropic.com",
+    "claude.ai",
+    "www.claude.ai",
+    "generativelanguage.googleapis.com"
+]
+
+HOSTS_PATH = r"C:\Windows\System32\drivers\etc\hosts" if sys.platform == "win32" else "/etc/hosts"
+REDIRECT_IP = "127.0.0.1"
+
+def block_ai_domains():
+    try:
+        with open(HOSTS_PATH, "r") as file:
+            content = file.read()
+
+        new_entries = []
+        for domain in AI_DOMAINS:
+            if domain not in content:
+                new_entries.append(f"{REDIRECT_IP} {domain}")
+
+        if new_entries:
+            with open(HOSTS_PATH, "a") as file:
+                file.write("\n" + "\n".join(new_entries) + "\n")
+            print(f"Blocked {len(new_entries)} domain(s).")
+        else:
+            print("All listed domains are already blocked.")
+
+    except PermissionError:
+        print("Error: Privilege escalation required. Run as Administrator or use sudo.")
+
+if __name__ == "__main__":
+    block_ai_domains()
