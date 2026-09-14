@@ -1,0 +1,27 @@
+import sys
+
+# List of major cloud AI API endpoints
+AI_DOMAINS = [
+    "://openai.com", "openai.com", "chatgpt.com",
+    "://anthropic.com", "claude.ai",
+    "://googleapis.com", "://google.com"
+]
+
+# Path to system hosts file
+HOSTS_PATH = r"C:\Windows\System32\drivers\etc\hosts" if sys.platform == "win32" else "/etc/hosts"
+REDIRECT_IP = "127.0.0.1"
+
+def block_ai_domains():
+    try:
+        with open(HOSTS_PATH, "r+") as file:
+            content = file.read()
+            for domain in AI_DOMAINS:
+                if domain not in content:
+                    file.write(f"\n{REDIRECT_IP} {domain}")
+                    print(f"Blocked: {domain}")
+        print("AI domains successfully blocked locally.")
+    except PermissionError:
+        print("Error: You must run this script with Administrative/Root privileges.")
+
+if __name__ == "__main__":
+    block_ai_domains()
