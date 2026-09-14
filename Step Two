@@ -1,0 +1,38 @@
+#Step Two Incert After step One to terminate Local Ai-
+
+
+import os
+import psutil
+import time
+
+AI_PROCESS_KEYWORDS = ["ollama", "llama", "localai", "stable-diffusion"]  # Removed broad "python" keyword
+
+def stop_local_ai():
+    print("Scanning for local AI processes...")
+    current_pid = os.getpid()
+    
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            if proc.info['pid'] == current_pid:
+                continue
+                
+            proc_name = proc.info['name'].lower()
+            if any(keyword in proc_name for keyword in AI_PROCESS_KEYWORDS):
+                print(f"Terminating AI process: {proc.info['name']} (PID: {proc.info['pid']})")
+                p = psutil.Process(proc.info['pid'])
+                
+                # Step 1: Graceful shutdown request
+                p.terminate() 
+                
+                # Step 2: Force kill if process does not exit within timeout
+                try:
+                    p.wait(timeout=3)
+                except psutil.TimeoutExpired:
+                    print(f"Process {proc.info['pid']} did not exit. Force killing...")
+                    p.kill()
+                    
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+
+if __name__ == "__main__":
+    stop_local_ai()
