@@ -1,7 +1,10 @@
 # Ai-Local-Terminater
+<img width="1024" height="559" alt="image_dbace0b3-c869-4f9b-af5b-54c78ae36478" src="https://github.com/user-attachments/assets/7dffa81f-b990-4e75-bf1d-e6f3cb3c8d22" />
+
 Shuts down ai on your system of choice just and gives it to you just follow these steps in order
 
  [Copy and paste] every step to your phone or Tablet and computer 
+<img width="1024" height="559" alt="image_0dba2531-1c44-4cc3-ab50-f1c44a5aa0d1" src="https://github.com/user-attachments/assets/61f4fb4e-3fa0-4377-9c57-575dc15c693b" />
 
 (Eliminations) step 1,2 - Gemini ,Google cloud,chat gp and all other cloud savers turns your ai into a flash for yourself on your (Computer) and makes local terminal eliminations 
 
@@ -113,6 +116,7 @@ def block_ai_domains():
 
 if __name__ == "__main__":
     block_ai_domains()import sys
+<img width="1024" height="559" alt="image_dffff080-28f2-4244-911d-bf1262d6fc0a" src="https://github.com/user-attachments/assets/39a5f620-e6d5-4c96-892c-14f5a7cebd7f" />
 
 # Standard domain names without protocol prefixes
 AI_DOMAINS = [
@@ -178,6 +182,7 @@ import os
 import sys
 import subprocess
 import psutil
+<img width="1024" height="559" alt="image_6df6abb5-dd39-45ae-89f8-b99b7e643f53" src="https://github.com/user-attachments/assets/2af12f8f-179e-47bc-af3c-17c7f10a5223" />
 
 # Configuration
 AI_PROCESS_KEYWORDS = ["ollama", "llama", "localai", "stable-diffusion"]
@@ -379,3 +384,4 @@ def stop_application_by_name(target_name: str):
 if __name__ == "__main__":
     stop_application_by_name("ollama.exe")
 
+<img width="1024" height="559" alt="image_c081bb80-7a7f-4580-9282-c664ccb28a55" src="https://github.com/user-attachments/assets/a7106782-28b4-4c0d-a1b7-75704ceeca4b" />
