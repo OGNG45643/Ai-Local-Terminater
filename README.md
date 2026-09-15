@@ -347,4 +347,4 @@ AI_DOMAINS = [
     "openrouter.ai", "api.openrouter.ai",
     "together.ai", "api.together.xyz",
     "huggingface.co", "api-infer.huggingface.co"
-]
+]Block cloud domains (requires Admin/sudo):sudo python ai_control.py blockKill running local engines:python ai_control.py stop --timeout 5 Run full cleanup sequence and force reboot:sudo python ai_control.py all --reboot --force
