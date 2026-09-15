@@ -1,0 +1,2 @@
+
+python ai_control.py stop --timeout 5
