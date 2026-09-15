@@ -354,3 +354,28 @@ Block cloud domains (requires Admin/sudo):sudo python ai_control.py
 blockKill running local engines:python ai_control.py stop --timeout 5
 
  Run full cleanup sequence and force reboot:sudo python ai_control.py all --reboot --force
+
+
+import os
+import psutil
+
+def stop_application_by_name(target_name: str):
+    """
+    Safely stops a specific background service by checking exact process names.
+    """
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            # Check for exact process match to avoid killing unintended services
+            if proc.info['name'] == target_name and proc.info['pid'] != os.getpid():
+                p = psutil.Process(proc.info['pid'])
+                p.terminate()  # Sends SIGTERM for safe cleanup
+                try:
+                    p.wait(timeout=5)
+                except psutil.TimeoutExpired:
+                    p.kill()   # Fallback to force stop if unresponsive
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+
+if __name__ == "__main__":
+    stop_application_by_name("ollama.exe")
+
