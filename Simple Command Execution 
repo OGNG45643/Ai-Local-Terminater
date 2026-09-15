@@ -1,0 +1,141 @@
+Here is a complete, production-ready CLI script that wraps process termination, domain blocking, and system rebooting into subcommands using argparse.
+
+import argparse
+import os
+import sys
+import subprocess
+import psutil
+
+# Configuration
+AI_PROCESS_KEYWORDS = ["ollama", "llama", "localai", "stable-diffusion"]
+AI_DOMAINS = [
+    "openai.com", "www.openai.com",
+    "chatgpt.com", "www.chatgpt.com",
+    "anthropic.com", "www.anthropic.com",
+    "claude.ai", "www.claude.ai",
+    "generativelanguage.googleapis.com"
+]
+HOSTS_PATH = r"C:\Windows\System32\drivers\etc\hosts" if sys.platform == "win32" else "/etc/hosts"
+REDIRECT_IP = "127.0.0.1"
+
+
+def stop_local_ai(timeout=3):
+    """Scans and terminates local AI processes."""
+    print("Scanning for local AI processes...")
+    current_pid = os.getpid()
+    terminated_count = 0
+
+    for proc in psutil.process_iter(['pid', 'name']):
+        try:
+            if proc.info['pid'] == current_pid:
+                continue
+
+            proc_name = proc.info['name'].lower()
+            if any(keyword in proc_name for keyword in AI_PROCESS_KEYWORDS):
+                print(f"Terminating AI process: {proc.info['name']} (PID: {proc.info['pid']})")
+                p = psutil.Process(proc.info['pid'])
+                p.terminate()
+
+                try:
+                    p.wait(timeout=timeout)
+                except psutil.TimeoutExpired:
+                    print(f"Process {proc.info['pid']} hung. Force killing...")
+                    p.kill()
+
+                terminated_count += 1
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            continue
+
+    print(f"Finished. Terminated {terminated_count} process(es).")
+
+
+def block_ai_domains():
+    """Appends major AI domains to system hosts file to block network access."""
+    try:
+        with open(HOSTS_PATH, "r") as file:
+            content = file.read()
+
+        new_entries = [f"{REDIRECT_IP} {domain}" for domain in AI_DOMAINS if domain not in content]
+
+        if new_entries:
+            with open(HOSTS_PATH, "a") as file:
+                file.write("\n# AI Domain Block\n" + "\n".join(new_entries) + "\n")
+            print(f"Successfully blocked {len(new_entries)} domain(s).")
+        else:
+            print("All listed domains are already blocked.")
+    except PermissionError:
+        print("Error: Privilege escalation required. Run as Administrator (Windows) or root/sudo (Linux/macOS).")
+
+
+def terminate_and_reboot(force=False):
+    """Triggers an OS-level reboot after cleaning up."""
+    print("Initiating system reboot...")
+    
+    if sys.platform == "win32":
+        cmd = ["shutdown", "/r", "/t", "0"]
+        if force:
+            cmd.insert(2, "/f")
+        res = subprocess.run(cmd, capture_output=True, text=True)
+        return_code = res.returncode
+    elif sys.platform in ["linux", "linux2", "darwin"]:
+        res = subprocess.run(["sudo", "reboot"], capture_output=True, text=True)
+        return_code = res.returncode
+        if return_code != 0:
+            print(f"Reboot failed (requires root/sudo): {res.stderr.strip()}")
+    else:
+        print(f"Unsupported platform: {sys.platform}")
+        return
+
+    if return_code == 0:
+        sys.exit("Python CLI tool execution complete.")
+
+
+def handle_all(args):
+    """Executes all tasks sequentially."""
+    print("--- Running Full AI Containment Sequence ---")
+    stop_local_ai(timeout=args.timeout)
+    block_ai_domains()
+    if args.reboot:
+        terminate_and_reboot(force=args.force)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="CLI Utility for managing local AI processes and network access.",
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
+
+    # Command: stop
+    stop_parser = subparsers.add_parser("stop", help="Scan and kill running local AI engines.")
+    stop_parser.add_argument("-t", "--timeout", type=int, default=3, help="Seconds to wait before force-killing hanging processes.")
+
+    # Command: block
+    subparsers.add_parser("block", help="Block cloud AI API domain endpoints in hosts file.")
+
+    # Command: reboot
+    reboot_parser = subparsers.add_parser("reboot", help="Reboot system.")
+    reboot_parser.add_argument("-f", "--force", action="store_true", help="Force close running applications without prompting.")
+
+    # Command: all
+    all_parser = subparsers.add_parser("all", help="Execute process kill, domain block, and optional reboot.")
+    all_parser.add_argument("-t", "--timeout", type=int, default=3, help="Timeout before force-kill.")
+    all_parser.add_argument("-r", "--reboot", action="store_true", help="Reboot system upon completion.")
+    all_parser.add_argument("-f", "--force", action="store_true", help="Force reboot applications.")
+
+    args = parser.parse_args()
+
+    if args.command == "stop":
+        stop_local_ai(timeout=args.timeout)
+    elif args.command == "block":
+        block_ai_domains()
+    elif args.command == "reboot":
+        terminate_and_reboot(force=args.force)
+    elif args.command == "all":
+        handle_all(args)
+    else:
+        parser.print_help()
+
+
+if __name__ == "__main__":
+    main()
