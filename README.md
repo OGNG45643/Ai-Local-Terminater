@@ -312,3 +312,39 @@ def main():
 
 if __name__ == "__main__":
     main()
+# Target Configuration
+AI_PROCESS_KEYWORDS = [
+    "ollama", "llama", "localai", "stable-diffusion", 
+    "lmstudio", "vllm", "jan-ai", "koboldcpp"
+]
+
+AI_DOMAINS = [
+    # OpenAI & ChatGPT
+    "openai.com", "://openai.com", "://openai.com",
+    "chatgpt.com", "://chatgpt.com",
+    
+    # Anthropic & Claude
+    "anthropic.com", "://anthropic.com", "://anthropic.com",
+    "claude.ai", "www.claude.ai",
+    
+    # Google Gemini
+    "://googleapis.com", "gemini.google.com", "aistudio.google.com",
+    
+    # DeepSeek
+    "deepseek.com", "www.deepseek.com", "api.deepseek.com", "platform.deepseek.com",
+    
+    # xAI & Grok
+    "x.ai", "api.x.ai", "grok.com", "www.grok.com",
+    
+    # Perplexity
+    "perplexity.ai", "www.perplexity.ai", "api.perplexity.ai",
+    
+    # Mistral AI
+    "mistral.ai", "www.mistral.ai", "api.mistral.ai", "console.mistral.ai",
+    
+    # High-Speed Hardware/Inference & Open Source Routers
+    "groq.com", "://groq.com", "://groq.com",
+    "openrouter.ai", "api.openrouter.ai",
+    "together.ai", "api.together.xyz",
+    "huggingface.co", "api-infer.huggingface.co"
+]
